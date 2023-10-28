@@ -83,6 +83,7 @@ pub mod epd2in7b;
 pub mod epd2in9;
 pub mod epd2in9_v2;
 pub mod epd2in9bc;
+pub mod epd2in9b_v3;
 pub mod epd3in7;
 pub mod epd4in2;
 pub mod epd5in65f;
@@ -99,7 +100,7 @@ pub(crate) mod type_a;
 pub mod prelude {
     pub use crate::color::{Color, OctColor, TriColor};
     pub use crate::traits::{
-        QuickRefresh, RefreshLut, WaveshareDisplay, WaveshareThreeColorDisplay,
+        QuickRefresh, RefreshLut, WaveshareDisplay, WaveshareDisplayV2, WaveshareThreeColorDisplay,
     };
 
     pub use crate::SPI_MODE;

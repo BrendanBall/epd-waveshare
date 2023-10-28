@@ -240,6 +240,103 @@ where
     fn wait_until_idle(&mut self, spi: &mut SPI, delay: &mut DELAY) -> Result<(), SPI::Error>;
 }
 
+/// WaveshareDisplay not exposing internal implementation generics
+pub trait WaveshareDisplayV2<SPI, DELAY>
+where
+SPI: SpiDevice,
+DELAY: DelayUs,
+
+
+{
+    /// The Color Type used by the Display
+    type DisplayColor;
+
+    /// Let the device enter deep-sleep mode to save power.
+    ///
+    /// The deep sleep mode returns to standby with a hardware reset.
+    fn sleep(&mut self, spi: &mut SPI, delay: &mut DELAY) -> Result<(), SPI::Error>;
+
+    /// Wakes the device up from sleep
+    ///
+    /// Also reintialises the device if necessary.
+    fn wake_up(&mut self, spi: &mut SPI, delay: &mut DELAY) -> Result<(), SPI::Error>;
+
+    /// Sets the backgroundcolor for various commands like [clear_frame](WaveshareDisplay::clear_frame)
+    fn set_background_color(&mut self, color: Self::DisplayColor);
+
+    /// Get current background color
+    fn background_color(&self) -> &Self::DisplayColor;
+
+    /// Get the width of the display
+    fn width(&self) -> u32;
+
+    /// Get the height of the display
+    fn height(&self) -> u32;
+
+    /// Transmit a full frame to the SRAM of the EPD
+    fn update_frame(
+        &mut self,
+        spi: &mut SPI,
+        buffer: &[u8],
+        delay: &mut DELAY,
+    ) -> Result<(), SPI::Error>;
+
+    /// Transmits partial data to the SRAM of the EPD
+    ///
+    /// (x,y) is the top left corner
+    ///
+    /// BUFFER needs to be of size: width / 8 * height !
+    #[allow(clippy::too_many_arguments)]
+    fn update_partial_frame(
+        &mut self,
+        spi: &mut SPI,
+        delay: &mut DELAY,
+        buffer: &[u8],
+        x: u32,
+        y: u32,
+        width: u32,
+        height: u32,
+    ) -> Result<(), SPI::Error>;
+
+    /// Displays the frame data from SRAM
+    ///
+    /// This function waits until the device isn`t busy anymore
+    fn display_frame(&mut self, spi: &mut SPI, delay: &mut DELAY) -> Result<(), SPI::Error>;
+
+    /// Provide a combined update&display and save some time (skipping a busy check in between)
+    fn update_and_display_frame(
+        &mut self,
+        spi: &mut SPI,
+        buffer: &[u8],
+        delay: &mut DELAY,
+    ) -> Result<(), SPI::Error>;
+
+    /// Clears the frame buffer on the EPD with the declared background color
+    ///
+    /// The background color can be changed with [`WaveshareDisplay::set_background_color`]
+    fn clear_frame(&mut self, spi: &mut SPI, delay: &mut DELAY) -> Result<(), SPI::Error>;
+
+    /// Trait for using various Waveforms from different LUTs
+    /// E.g. for partial refreshes
+    ///
+    /// A full refresh is needed after a certain amount of quick refreshes!
+    ///
+    /// WARNING: Quick Refresh might lead to ghosting-effects/problems with your display. Especially for the 4.2in Display!
+    ///
+    /// If None is used the old value will be loaded on the LUTs once more
+    fn set_lut(
+        &mut self,
+        spi: &mut SPI,
+        delay: &mut DELAY,
+        refresh_rate: Option<RefreshLut>,
+    ) -> Result<(), SPI::Error>;
+
+    /// Wait until the display has stopped processing data
+    ///
+    /// You can call this to make sure a frame is displayed before goin further
+    fn wait_until_idle(&mut self, spi: &mut SPI, delay: &mut DELAY) -> Result<(), SPI::Error>;
+}
+
 /// Allows quick refresh support for displays that support it; lets you send both
 /// old and new frame data to support this.
 ///
