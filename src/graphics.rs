@@ -355,10 +355,25 @@ fn set_pixel<COLOR: ColorType>(
 mod tests {
     use super::*;
     use crate::color::*;
+    use crate::buffer_len;
     use embedded_graphics::{
         prelude::*,
         primitives::{Line, PrimitiveStyle},
     };
+
+    // test set pixel
+    #[test]
+    fn set_pixel_1() {
+        // 16 pixels fit in 2 bytes. 
+        const WIDTH: usize = 16;
+        const HEIGHT: usize = 4;
+        const BUFFER_SIZE: usize = buffer_len(WIDTH, HEIGHT * 2);
+        let mut buffer = [0u8; BUFFER_SIZE];
+        let point = Point::new(7, 0);
+        // assert_eq!(TriColor::Chromatic.bitmask(false, point.x as u32), (1, 1));
+        set_pixel(&mut buffer, WIDTH as u32, HEIGHT as u32, DisplayRotation::Rotate0, false, Pixel(point, TriColor::Chromatic));
+        assert_eq!(buffer, [0u8; BUFFER_SIZE]);
+    }
 
     // test buffer length
     #[test]

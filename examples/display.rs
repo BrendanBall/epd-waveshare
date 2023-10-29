@@ -50,8 +50,10 @@ fn to_image(width: u32, height: u32, bw_buffer: &[u8], chromatic_buffer: &[u8]) 
     ImageBuffer::from_vec(width, height, data).unwrap()
 }
 
-fn to_rgb(black_bit: u8, red_bit: u8) -> Rgb<u8> {
-    let rgb: [u8; 3] = match (black_bit, red_bit) {
+/// BWRBIT=true: chromatic doesn't override white, white bit cleared for black, white bit set for white, both bits set for chromatic
+/// BWRBIT=false: chromatic does override white, both bits cleared for black, white bit set for white, red bit set for black
+fn to_rgb(white_bit: u8, red_bit: u8) -> Rgb<u8> {
+    let rgb: [u8; 3] = match (white_bit, red_bit) {
         (1, 1) => [255, 255, 255],
         (1, 0) => [255, 0, 0],
         (0, 1) => [0, 0, 0],
