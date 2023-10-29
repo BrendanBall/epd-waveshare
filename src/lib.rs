@@ -100,7 +100,7 @@ pub(crate) mod type_a;
 pub mod prelude {
     pub use crate::color::{Color, OctColor, TriColor};
     pub use crate::traits::{
-        QuickRefresh, RefreshLut, WaveshareDisplay, WaveshareDisplayV2, WaveshareThreeColorDisplay,
+        QuickRefresh, RefreshLut, WaveshareDisplay, WaveshareDisplayV2, WaveshareThreeColorDisplay, WaveshareThreeColorDisplayV2,
     };
 
     pub use crate::SPI_MODE;

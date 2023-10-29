@@ -82,6 +82,47 @@ where
     ) -> Result<(), SPI::Error>;
 }
 
+/// Functions to interact with three color panels
+pub trait WaveshareThreeColorDisplayV2<SPI, DELAY>:
+    WaveshareDisplayV2<SPI, DELAY>
+where
+    SPI: SpiDevice,
+    DELAY: DelayUs,
+{
+    /// Transmit data to the SRAM of the EPD
+    ///
+    /// Updates both the black and the secondary color layers
+    fn update_color_frame(
+        &mut self,
+        spi: &mut SPI,
+        delay: &mut DELAY,
+        black: &[u8],
+        chromatic: &[u8],
+    ) -> Result<(), SPI::Error>;
+
+    /// Update only the black/white data of the display.
+    ///
+    /// This must be finished by calling `update_chromatic_frame`.
+    fn update_achromatic_frame(
+        &mut self,
+        spi: &mut SPI,
+        delay: &mut DELAY,
+        black: &[u8],
+    ) -> Result<(), SPI::Error>;
+
+    /// Update only the chromatic data of the display.
+    ///
+    /// This should be preceded by a call to `update_achromatic_frame`.
+    /// This data takes precedence over the black/white data.
+    fn update_chromatic_frame(
+        &mut self,
+        spi: &mut SPI,
+        delay: &mut DELAY,
+        chromatic: &[u8],
+    ) -> Result<(), SPI::Error>;
+}
+
+
 /// All the functions to interact with the EPDs
 ///
 /// This trait includes all public functions to use the EPDs

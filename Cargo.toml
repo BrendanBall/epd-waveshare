@@ -22,6 +22,7 @@ bit_field = "0.10.1"
 
 [dev-dependencies]
 embedded-graphics = "0.8"
+image = "0.24.7"
 
 embedded-hal-mock = { git = "https://github.com/newAM/embedded-hal-mock", branch = "eh1-rc.1", default-features = false, features = [
     "eh1",

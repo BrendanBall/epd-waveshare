@@ -58,7 +58,7 @@ use embedded_hal::{delay::*, digital::*, spi::SpiDevice};
 
 use crate::interface::DisplayInterface;
 use crate::traits::{
-    InternalWiAdditions, RefreshLut, WaveshareDisplay, WaveshareThreeColorDisplay, WaveshareDisplayV2,
+    InternalWiAdditions, RefreshLut, WaveshareThreeColorDisplayV2, WaveshareDisplayV2,
 };
 
 /// Width of epd2in9bc in pixels
@@ -78,7 +78,7 @@ const CHROMATIC_BORDER: u8 = 0xb0;
 const FLOATING_BORDER: u8 = 0xF0;
 const SINGLE_BYTE_WRITE: bool = true;
 
-use crate::color::{Color, TriColor};
+use crate::color::TriColor;
 
 pub(crate) mod command;
 use self::command::Command;
@@ -144,56 +144,56 @@ where
     }
 }
 
-// impl<SPI, BUSY, DC, RST, DELAY> WaveshareThreeColorDisplay<SPI, BUSY, DC, RST, DELAY>
-//     for Epd2in9b<SPI, BUSY, DC, RST, DELAY>
-// where
-//     SPI: SpiDevice,
-//     BUSY: InputPin,
-//     DC: OutputPin,
-//     RST: OutputPin,
-//     DELAY: DelayUs,
-// {
-//     fn update_color_frame(
-//         &mut self,
-//         spi: &mut SPI,
-//         delay: &mut DELAY,
-//         black: &[u8],
-//         chromatic: &[u8],
-//     ) -> Result<(), SPI::Error> {
-//         self.update_achromatic_frame(spi, delay, black)?;
-//         self.update_chromatic_frame(spi, delay, chromatic)
-//     }
+impl<SPI, BUSY, DC, RST, DELAY> WaveshareThreeColorDisplayV2<SPI, DELAY>
+    for Epd2in9b<SPI, BUSY, DC, RST, DELAY>
+where
+    SPI: SpiDevice,
+    BUSY: InputPin,
+    DC: OutputPin,
+    RST: OutputPin,
+    DELAY: DelayUs,
+{
+    fn update_color_frame(
+        &mut self,
+        spi: &mut SPI,
+        delay: &mut DELAY,
+        black: &[u8],
+        chromatic: &[u8],
+    ) -> Result<(), SPI::Error> {
+        self.update_achromatic_frame(spi, delay, black)?;
+        self.update_chromatic_frame(spi, delay, chromatic)
+    }
 
-//     /// Update only the black/white data of the display.
-//     ///
-//     /// Finish by calling `update_chromatic_frame`.
-//     fn update_achromatic_frame(
-//         &mut self,
-//         spi: &mut SPI,
-//         _delay: &mut DELAY,
-//         black: &[u8],
-//     ) -> Result<(), SPI::Error> {
-//         self.interface.cmd(spi, Command::DataStartTransmission1)?;
-//         self.interface.data(spi, black)?;
-//         Ok(())
-//     }
+    /// Update only the black/white data of the display.
+    ///
+    /// Finish by calling `update_chromatic_frame`.
+    fn update_achromatic_frame(
+        &mut self,
+        spi: &mut SPI,
+        _delay: &mut DELAY,
+        black: &[u8],
+    ) -> Result<(), SPI::Error> {
+        self.interface.cmd(spi, Command::DataStartTransmission1)?;
+        self.interface.data(spi, black)?;
+        Ok(())
+    }
 
-//     /// Update only chromatic data of the display.
-//     ///
-//     /// This data takes precedence over the black/white data.
-//     fn update_chromatic_frame(
-//         &mut self,
-//         spi: &mut SPI,
-//         delay: &mut DELAY,
-//         chromatic: &[u8],
-//     ) -> Result<(), SPI::Error> {
-//         self.interface.cmd(spi, Command::DataStartTransmission2)?;
-//         self.interface.data(spi, chromatic)?;
+    /// Update only chromatic data of the display.
+    ///
+    /// This data takes precedence over the black/white data.
+    fn update_chromatic_frame(
+        &mut self,
+        spi: &mut SPI,
+        delay: &mut DELAY,
+        chromatic: &[u8],
+    ) -> Result<(), SPI::Error> {
+        self.interface.cmd(spi, Command::DataStartTransmission2)?;
+        self.interface.data(spi, chromatic)?;
 
-//         self.wait_until_idle(spi, delay)?;
-//         Ok(())
-//     }
-// }
+        self.wait_until_idle(spi, delay)?;
+        Ok(())
+    }
+}
 
 // impl<SPI, BUSY, DC, RST, DELAY> WaveshareDisplay<SPI, BUSY, DC, RST, DELAY>
 //     for Epd2in9b<SPI, BUSY, DC, RST, DELAY>

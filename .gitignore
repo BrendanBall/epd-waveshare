@@ -1,6 +1,7 @@
 # Generated files
 **/target
 **/*.rs.bk
+*.png
 
 
 # The library shouldn't decide about the exact versions of 
